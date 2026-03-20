@@ -1154,7 +1154,7 @@ function ProductCard({ tab, data, countryName, flag }) {
   return (
     <div style={{padding:"24px 0"}}>
       <div style={{marginBottom:6,fontSize:9,letterSpacing:4,color:"#8b7355",textTransform:"uppercase",fontFamily:"'Cormorant Garamond',serif"}}>{flag} {countryName}</div>
-      <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:400,color:"#582216",marginBottom:4}}>{d.product}</h3>
+      <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:400,color:"#401D16",marginBottom:4}}>{d.product}</h3>
       <div style={{fontSize:10,letterSpacing:3,color:"#c4a882",textTransform:"uppercase",fontFamily:"'Cormorant Garamond',serif",marginBottom:12}}>{d.heroIngredient}</div>
       <p style={{fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",fontSize:15,color:"#8b7355",marginBottom:14,lineHeight:1.6}}>"{d.editorNote}"</p>
       <p style={{fontFamily:"'Cormorant Garamond',serif",fontSize:15,color:"#5a4a38",lineHeight:1.75,marginBottom:16}}>{d.ritual}</p>
