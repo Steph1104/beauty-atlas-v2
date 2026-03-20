@@ -1,5 +1,18 @@
 import { useState } from "react";
 
+const flagCodes = {
+  "🇰🇷":"kr","🇫🇷":"fr","🇯🇵":"jp","🇲🇦":"ma","🇮🇳":"in","🇧🇷":"br",
+  "🇸🇪":"se","🇳🇬":"ng","🇦🇺":"au","🇪🇬":"eg","🇮🇹":"it","🇹🇭":"th",
+  "🇪🇹":"et","🇬🇷":"gr","🇨🇳":"cn","🇬🇭":"gh","🇨🇴":"co","🇦🇷":"ar",
+  "🇺🇸":"us","🇲🇽":"mx","🇳🇿":"nz"
+};
+
+function FlagImg({ emoji, size=32 }) {
+  const code = flagCodes[emoji];
+  if (!code) return <span style={{fontSize:size}}>{emoji}</span>;
+  return <img src={`https://flagcdn.com/w${size*2}/${code}.png`} width={size*1.4} height={size} style={{objectFit:"cover",borderRadius:3,display:"inline-block",verticalAlign:"middle"}} alt={code} />;
+}
+
 const beautyTabs = [
   { id: "skincare", label: "Skincare", icon: "✨" },
   { id: "haircare", label: "Haircare", icon: "💆" },
@@ -1153,7 +1166,7 @@ function ProductCard({ tab, data, countryName, flag }) {
   if (!d) return null;
   return (
     <div style={{padding:"24px 0"}}>
-      <div style={{marginBottom:6,fontSize:9,letterSpacing:4,color:"#8b7355",textTransform:"uppercase",fontFamily:"'Cormorant Garamond',serif"}}>{flag} {countryName}</div>
+      <div style={{marginBottom:6,fontSize:9,letterSpacing:4,color:"#8b7355",textTransform:"uppercase",fontFamily:"'Cormorant Garamond',serif"}}><FlagImg emoji={flag} size={14} /> {countryName}</div>
       <h3 style={{fontFamily:"'Playfair Display',serif",fontSize:20,fontWeight:400,color:"#401D16",marginBottom:4}}>{d.product}</h3>
       <div style={{fontSize:10,letterSpacing:3,color:"#c4a882",textTransform:"uppercase",fontFamily:"'Cormorant Garamond',serif",marginBottom:12}}>{d.heroIngredient}</div>
       <p style={{fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",fontSize:15,color:"#8b7355",marginBottom:14,lineHeight:1.6}}>"{d.editorNote}"</p>
@@ -1185,7 +1198,7 @@ function ExploreScreen({ onBack }) {
           <div style={{maxWidth:720,margin:"0 auto"}}>
             <button className="back-btn" onClick={() => setSelectedCountry(null)} style={{marginBottom:24}}>← All Countries</button>
             <div style={{display:"flex",alignItems:"flex-start",gap:16,marginBottom:28}}>
-              <span style={{fontSize:52}}>{selectedCountry.flag}</span>
+              <span style={{fontSize:52}}><FlagImg emoji={selectedCountry.flag} size={40} /></span>
               <div>
                 <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(28px,5vw,44px)",fontWeight:400,color:"#401D16",letterSpacing:4,textTransform:"uppercase"}}>{selectedCountry.name}</h1>
                 <p style={{fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",fontSize:16,color:"#8b7355",marginTop:4,lineHeight:1.6}}>{selectedCountry.philosophy}</p>
@@ -1219,16 +1232,16 @@ function ExploreScreen({ onBack }) {
               {filtered.map(country => (
                 <div key={country.name} className="country-card" onClick={() => { setSelectedCountry(country); setActiveTab("skincare"); }} style={{padding:"24px"}}>
                   <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:14}}>
-                    <span style={{fontSize:32}}>{country.flag}</span>
+                    <FlagImg emoji={country.flag} size={32} />
                     <div>
-                      <div style={{fontFamily:"'Playfair Display',serif",fontSize:18,fontWeight:400,color:"#401D16",letterSpacing:2}}>{country.name}</div>
-                      <div style={{fontSize:9,letterSpacing:3,color:"#c4a882",textTransform:"uppercase",fontFamily:"'Cormorant Garamond',serif"}}>{country.region}</div>
+                      <div style={{fontFamily:"'Playfair Display',serif",fontSize:22,fontWeight:500,color:"#1C1008",letterSpacing:1}}>{country.name}</div>
+                      <div style={{fontSize:11,letterSpacing:3,color:"#8b7355",textTransform:"uppercase",fontFamily:"'Cormorant Garamond',serif",marginTop:2}}>{country.region}</div>
                     </div>
                   </div>
-                  <p style={{fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",fontSize:14,color:"#8b7355",lineHeight:1.6,marginBottom:16}}>{country.philosophy}</p>
+                  <p style={{fontFamily:"'Cormorant Garamond',serif",fontStyle:"italic",fontSize:15,color:"#5a4a38",lineHeight:1.6,marginBottom:16}}>{country.philosophy}</p>
                   <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
                     {beautyTabs.map(t => (
-                      <span key={t.id} style={{fontSize:9,letterSpacing:2,textTransform:"uppercase",color:"rgba(139,115,85,0.7)",fontFamily:"'Cormorant Garamond',serif",background:"rgba(196,168,130,0.1)",padding:"4px 8px",borderRadius:2}}>
+                      <span key={t.id} style={{fontSize:11,letterSpacing:1,textTransform:"uppercase",color:"#5a4a38",fontFamily:"'Cormorant Garamond',serif",background:"rgba(196,168,130,0.25)",padding:"5px 10px",borderRadius:2,border:"1px solid rgba(196,168,130,0.4)"}}>
                         {t.icon} {t.label}
                       </span>
                     ))}
@@ -1264,7 +1277,7 @@ function SkinConcernScreen({ onBack }) {
               {data.countries.map((c, i) => (
                 <div key={i} style={{background:"#fff",border:"1px solid rgba(196,168,130,0.2)",padding:"28px"}}>
                   <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:16}}>
-                    <span style={{fontSize:28}}>{c.flag}</span>
+                    <span style={{fontSize:28}}><FlagImg emoji={c.flag} size={22} /></span>
                     <div>
                       <div style={{fontFamily:"'Playfair Display',serif",fontSize:16,color:"#401D16",letterSpacing:2}}>{c.country}</div>
                       <div style={{fontSize:9,letterSpacing:3,color:"#c4a882",textTransform:"uppercase",fontFamily:"'Cormorant Garamond',serif"}}>{c.heroIngredient}</div>
