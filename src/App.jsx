@@ -1300,22 +1300,82 @@ function SkinConcernScreen({ onBack }) {
   );
 }
 
+function GlobeCanvas() {
+  const canvasRef = React.useRef(null);
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const W=240,R=114,CX=120,CY=120;
+    let rotY=0,rotX=0.2,drag=false,px=0,py=0,vx=0,vy=0,animId;
+    const pinks=['#E8B4BC','#D4A0A7','#C47E8A','#F0C8CC','#B8687A','#CC8E9A','#E8B4BC','#D4A0A7'];
+
+    function draw(countries){
+      ctx.clearRect(0,0,W,W);
+      ctx.save();
+      ctx.beginPath();ctx.arc(CX,CY,R,0,Math.PI*2);ctx.clip();
+      ctx.fillStyle='#521A10';ctx.fillRect(0,0,W,W);
+      const proj=window._d3geo.geoOrthographic().scale(R).translate([CX,CY]).rotate([rotY*180/Math.PI,-rotX*180/Math.PI]);
+      const path=window._d3geo.geoPath(proj,ctx);
+      ctx.strokeStyle='rgba(196,168,130,0.1)';ctx.lineWidth=0.4;
+      ctx.beginPath();path(window._d3geo.geoGraticule()());ctx.stroke();
+      countries.forEach((f,i)=>{
+        ctx.beginPath();path(f);
+        ctx.fillStyle=pinks[i%pinks.length];ctx.fill();
+        ctx.strokeStyle='rgba(60,15,8,0.3)';ctx.lineWidth=0.3;ctx.stroke();
+      });
+      const depth=ctx.createRadialGradient(CX,CY,R*0.3,CX,CY,R);
+      depth.addColorStop(0,'rgba(0,0,0,0)');
+      depth.addColorStop(0.8,'rgba(0,0,0,0.05)');
+      depth.addColorStop(1,'rgba(0,0,0,0.3)');
+      ctx.fillStyle=depth;ctx.fillRect(0,0,W,W);
+      const shine=ctx.createRadialGradient(CX-35,CY-35,0,CX-15,CY-15,R*0.75);
+      shine.addColorStop(0,'rgba(255,230,200,0.1)');
+      shine.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=shine;ctx.fillRect(0,0,W,W);
+      ctx.restore();
+    }
+
+    function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+
+    async function init(){
+      await loadScript('https://cdn.jsdelivr.net/npm/d3-array@3/dist/d3-array.min.js');
+      await loadScript('https://cdn.jsdelivr.net/npm/d3-geo@3/dist/d3-geo.min.js');
+      await loadScript('https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js');
+      window._d3geo = window.d3 || {geoOrthographic:d3.geoOrthographic,geoPath:d3.geoPath,geoGraticule:d3.geoGraticule};
+      const r = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+      const world = await r.json();
+      const countries = topojson.feature(world,world.objects.countries).features;
+      const onMD=e=>{drag=true;px=e.clientX;py=e.clientY;canvas.style.cursor='grabbing';};
+      const onMU=()=>{drag=false;canvas.style.cursor='grab';};
+      const onMM=e=>{if(!drag)return;vx=(e.clientY-py)*0.005;vy=(e.clientX-px)*0.005;rotX+=vx;rotY+=vy;rotX=Math.max(-1.3,Math.min(1.3,rotX));px=e.clientX;py=e.clientY;};
+      const onTS=e=>{drag=true;px=e.touches[0].clientX;py=e.touches[0].clientY;};
+      const onTE=()=>{drag=false;};
+      const onTM=e=>{if(!drag)return;vx=(e.touches[0].clientY-py)*0.005;vy=(e.touches[0].clientX-px)*0.005;rotX+=vx;rotY+=vy;rotX=Math.max(-1.3,Math.min(1.3,rotX));px=e.touches[0].clientX;py=e.touches[0].clientY;};
+      canvas.addEventListener('mousedown',onMD);window.addEventListener('mouseup',onMU);window.addEventListener('mousemove',onMM);
+      canvas.addEventListener('touchstart',onTS);window.addEventListener('touchend',onTE);window.addEventListener('touchmove',onTM);
+      function animate(){animId=requestAnimationFrame(animate);if(!drag){vx*=0.96;vy*=0.96;rotY+=vy+0.004;rotX+=vx;}draw(countries);}
+      animate();
+      return()=>{cancelAnimationFrame(animId);canvas.removeEventListener('mousedown',onMD);window.removeEventListener('mouseup',onMU);window.removeEventListener('mousemove',onMM);};
+    }
+    init();
+  },[]);
+  return (
+    <div style={{position:'relative',width:240,height:240,margin:'0 auto 20px'}}>
+      <canvas ref={canvasRef} width={240} height={240} style={{borderRadius:'50%',cursor:'grab',display:'block'}} />
+      <div style={{position:'absolute',inset:0,borderRadius:'50%',pointerEvents:'none',boxShadow:'inset -25px -18px 50px rgba(0,0,0,0.2),inset 10px 10px 25px rgba(255,255,255,0.05)'}} />
+    </div>
+  );
+}
+
 function LandingScreen({ onEnter }) {
   return (
     <div style={{minHeight:"100vh",background:"#401D16",display:"flex",alignItems:"center",justifyContent:"center",position:"relative",overflow:"hidden"}}>
       <style>{css}</style>
       <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at 50% 50%, rgba(196,168,130,0.06) 0%, transparent 70%)",pointerEvents:"none"}} />
       <div className="ff" style={{textAlign:"center",position:"relative",zIndex:10,padding:"24px"}}>
-        <div style={{marginBottom:20}}>
-          <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" style={{opacity:0.7}}>
-            <circle cx="32" cy="32" r="28" stroke="#c4a882" strokeWidth="1.5" fill="none"/>
-            <ellipse cx="32" cy="32" rx="14" ry="28" stroke="#c4a882" strokeWidth="1.5" fill="none"/>
-            <ellipse cx="32" cy="32" rx="28" ry="10" stroke="#c4a882" strokeWidth="1.5" fill="none"/>
-            <line x1="4" y1="32" x2="60" y2="32" stroke="#c4a882" strokeWidth="1.5"/>
-            <line x1="32" y1="4" x2="32" y2="60" stroke="#c4a882" strokeWidth="1.5"/>
-          </svg>
-        </div>
-        <div style={{fontSize:13,letterSpacing:6,color:"rgba(196,168,130,0.85)",textTransform:"uppercase",fontFamily:"'Cormorant Garamond',serif",marginBottom:24}}>A Global Beauty Compendium</div>
+        <div style={{fontSize:13,letterSpacing:6,color:"rgba(196,168,130,0.85)",textTransform:"uppercase",fontFamily:"'Cormorant Garamond',serif",marginBottom:20}}>A Global Beauty Compendium</div>
+        <GlobeCanvas />
         <div style={{marginBottom:6}}>
           <h1 style={{fontFamily:"'Playfair Display',serif",fontSize:"clamp(40px,10vw,92px)",fontWeight:400,color:"#f5f0eb",letterSpacing:14,textTransform:"uppercase",lineHeight:1,display:"inline"}}>Beauty</h1>
         </div>
@@ -1332,7 +1392,7 @@ function LandingScreen({ onEnter }) {
             Explore by Country
           </button>
           <button className="land-btn" onClick={() => onEnter("concern")}
-            style={{padding:"17px 42px",border:"1px solid rgba(245,240,235,0.25)",background:"transparent",color:"rgba(245,240,235,0.6)"}}>
+            style={{padding:"17px 42px",border:"1px solid #c4a882",background:"transparent",color:"#c4a882"}}>
             My Skin Concern
           </button>
         </div>
@@ -1340,7 +1400,7 @@ function LandingScreen({ onEnter }) {
           {[["21","Countries"],["4","Categories"],["8","Concerns"],["Deep","Research"]].map(([n,l]) => (
             <div key={l} style={{textAlign:"center"}}>
               <div style={{fontFamily:"'Playfair Display',serif",fontSize:22,color:"#c4a882",marginBottom:4}}>{n}</div>
-              <div style={{fontSize:8,letterSpacing:4,color:"rgba(196,168,130,0.85)",textTransform:"uppercase",fontFamily:"'Cormorant Garamond',serif"}}>{l}</div>
+              <div style={{fontSize:12,letterSpacing:3,color:"rgba(196,168,130,0.85)",textTransform:"uppercase",fontFamily:"'Cormorant Garamond',serif"}}>{l}</div>
             </div>
           ))}
         </div>
