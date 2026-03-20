@@ -1312,7 +1312,7 @@ function LandingScreen({ onEnter }) {
       <div style={{position:"absolute",inset:0,pointerEvents:"none"}}>
         {floatingFlags.map((flag, i) => (
           <div key={i} className="flag-float"
-            style={{position:"absolute",fontSize:28,opacity:0.12,
+            style={{position:"absolute",fontSize:28,opacity:0.35,
               left:`${5 + (i * 23) % 90}%`,top:`${10 + (i * 17) % 80}%`,
               "--dur":`${5 + (i % 4)}s`,"--delay":`${(i * 0.4) % 3}s`}}>
             {flag}
