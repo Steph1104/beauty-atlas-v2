@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const flagCodes = {
   "🇰🇷":"kr","🇫🇷":"fr","🇯🇵":"jp","🇲🇦":"ma","🇮🇳":"in","🇧🇷":"br",
@@ -1314,8 +1314,8 @@ function SkinConcernScreen({ onBack }) {
 }
 
 function GlobeCanvas() {
-  const canvasRef = React.useRef(null);
-  React.useEffect(() => {
+  const canvasRef = useRef(null);
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
